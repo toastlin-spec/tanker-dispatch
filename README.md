@@ -9,6 +9,7 @@
 系統會自動算出每趟的時間軸，並檢查排班規則（做六休一、兩天之間休息 11 小時、油站營業時間等）。
 
 - 規格書：[docs/spec.md](docs/spec.md)
+- 調度員操作手冊：[docs/manual.md](docs/manual.md)
 - 初始資料：[data/](data/)
 
 ## 啟動
