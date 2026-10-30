@@ -1,0 +1,33 @@
+{
+  "name": "@tanker/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "派車系統前端：React + Vite + Ant Design（zh_TW）",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ant-design/icons": "5.6.1",
+    "@dnd-kit/core": "6.3.1",
+    "@dnd-kit/sortable": "10.0.0",
+    "@dnd-kit/utilities": "3.2.2",
+    "@tanker/core": "*",
+    "@tanstack/react-query": "5.103.3",
+    "antd": "5.29.3",
+    "dayjs": "1.11.23",
+    "html-to-image": "1.11.13",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.30.6"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "5.2.0",
+    "vite": "7.3.7"
+  }
+}
