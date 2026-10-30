@@ -1,0 +1,183 @@
+// 油罐車派車管理系統資料模型（規格書第 8 節）。
+// 列舉值用字串存放，由 API 驗證；計算出的時間軸不存表，發布時另存快照。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// 據點：出發廠（depot）、灌油點（loading）、油站（station）
+model Location {
+  id               String   @id
+  name             String
+  /// depot / loading / station
+  type             String
+  /// central / south
+  region           String
+  address          String?
+  googleName       String?
+  lat              Float?
+  lng              Float?
+  hours24          Boolean  @default(true)
+  /// HH:MM
+  openTime         String?
+  /// HH:MM
+  closeTime        String?
+  defaultLoadingId String?
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  legsFrom Leg[] @relation("LegFrom")
+  legsTo   Leg[] @relation("LegTo")
+}
+
+/// 路段：兩個據點之間的油罐車行車時間（分鐘），有方向性
+model Leg {
+  id        Int      @id @default(autoincrement())
+  fromId    String
+  toId      String
+  minutes   Int
+  /// excel / confirmed / google_x1.5 / estimate / manual
+  source    String
+  note      String?
+  updatedAt DateTime @updatedAt
+
+  from Location @relation("LegFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Location @relation("LegTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+}
+
+model Vehicle {
+  id             String   @id
+  name           String
+  tractorPlate   String?
+  trailerPlate   String?
+  /// 每艙容量（KL），例如 [15, 15]
+  compartmentsKL Float[]
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  drivers Driver[]
+  duties  Duty[]
+}
+
+model Driver {
+  id          String   @id
+  name        String
+  homeDepotId String
+  /// day / night
+  shift       String
+  vehicleId   String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  duties  Duty[]
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  stationId   String
+  date        DateTime @db.Date
+  /// 92 / 95 / diesel
+  product     String
+  quantityKL  Float
+  /// 希望到達時段（選填，HH:MM）
+  windowStart String?
+  windowEnd   String?
+  /// pending / scheduled / completed / cancelled
+  status      String   @default("pending")
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  drops Drop[]
+
+  @@index([date])
+}
+
+/// 班表：一位司機一天的所有車趟
+model Duty {
+  id          String    @id @default(cuid())
+  driverId    String
+  date        DateTime  @db.Date
+  /// 日班出車時間 HH:MM；大夜班一律用設定的出車時間
+  startTime   String
+  /// 手動換掛時指定的車輛；null 表示用司機的固定車輛
+  vehicleId   String?
+  /// draft / published
+  status      String    @default("draft")
+  /// 發布時的時間軸與派車單內容
+  snapshot    Json?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  driver  Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  trips   Trip[]
+
+  @@unique([driverId, date])
+  @@index([date])
+}
+
+/// 車趟：灌油一次，再送一站或兩站
+model Trip {
+  id        String  @id @default(cuid())
+  dutyId    String
+  seq       Int
+  /// 手動指定的灌油點；null 表示依規則自動選擇
+  loadingId String?
+
+  duty  Duty   @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  drops Drop[]
+
+  @@index([dutyId])
+}
+
+model Drop {
+  id             String @id @default(cuid())
+  tripId         String
+  seq            Int
+  orderId        String
+  stationId      String
+  /// 這次送的量（訂單超過一趟容量時會拆成多個 drop）
+  quantityKL     Float
+  compartmentIdx Int[]
+
+  trip  Trip  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([tripId])
+  @@index([orderId])
+}
+
+/// 設定：作業時間、倍數、單數上限、規則開關（value 為 JSON）
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+/// 操作紀錄，包含發布時的警告原因
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  at         DateTime @default(now())
+  action     String
+  entityType String
+  entityId   String?
+  summary    String
+  detail     Json?
+  reason     String?
+
+  @@index([entityType, entityId])
+  @@index([at])
+}
