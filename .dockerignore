@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+!.env.example
+.pg-data
+**/node_modules
+**/dist
+**/coverage
+*.log

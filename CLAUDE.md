@@ -29,3 +29,12 @@
 ## 測試
 
 `packages/core` 的單元測試必須涵蓋 `docs/spec.md` 第 6.4 節的範例 A、B、C，以及第 7 節每一條規則的通過與違規情況。
+
+## 部署（GCP Cloud Run + Cloud SQL，asia-east1）
+
+- 步驟一律依 `docs/deploy.md`；登入用的 OAuth 用戶端依 `docs/auth.md`。使用者通常在 Cloud Shell 執行 Claude Code，gcloud 已登入使用者的帳號。
+- 使用者不是工程師：每一步先用一兩句白話說明要做什麼、會不會產生費用，再執行。
+- 下列動作執行前一定要先問使用者並等確認：建立 Cloud SQL 執行個體（會持續計費）、刪除任何 GCP 資源、修改 IAM 權限、刪除或覆寫 Secret Manager 的密鑰、清空資料庫。
+- 只有使用者能做的事，請引導他操作，不要假裝完成：在 GCP 主控台建立 OAuth 用戶端、貼上用戶端密碼。
+- 密碼與密鑰只放在 Secret Manager，不要印在畫面上，也不要寫進 repo；`deploy.env` 不能 commit。
+- 部署或更新：`bash scripts/deploy-cloudrun.sh`。有錯誤時先用 `gcloud run services logs read` 看記錄，再對照 `docs/deploy.md` 的「疑難排解」。

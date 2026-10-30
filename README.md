@@ -9,6 +9,7 @@
 系統會自動算出每趟的時間軸，並檢查排班規則（做六休一、兩天之間休息 11 小時、油站營業時間等）。
 
 - 規格書：[docs/spec.md](docs/spec.md)
+- 調度員操作手冊：[docs/manual.md](docs/manual.md)
 - 初始資料：[data/](data/)
 
 ## 啟動
@@ -41,6 +42,10 @@ npm run dev
 
 - 本機沒有設定 Google 登入時，`npm run dev` 使用開發模式：登入頁直接選 `dispatcher@example.com` 登入。
 - 正式環境要建立 Google OAuth 用戶端並設定環境變數，步驟見 [docs/auth.md](docs/auth.md)。
+
+### 部署到 GCP
+
+Cloud Run + Cloud SQL（asia-east1），全部在瀏覽器的 Cloud Shell 完成，步驟見 [docs/deploy.md](docs/deploy.md)。
 
 ## 常用指令
 
