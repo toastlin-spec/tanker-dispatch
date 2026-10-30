@@ -14,7 +14,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "test": "vitest run"
+    "test": "vitest run",
+    "start:prod": "sh docker-start.sh"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",
@@ -23,15 +24,15 @@
     "@prisma/client": "6.19.3",
     "@tanker/core": "*",
     "express": "5.3.0",
-    "google-auth-library": "^10.9.1",
+    "google-auth-library": "10.9.1",
+    "prisma": "6.19.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
+    "tsx": "4.23.15",
     "zod": "3.25.76"
   },
   "devDependencies": {
     "@types/express": "5.0.6",
-    "prisma": "6.19.3",
-    "tsx": "4.23.15",
-    "vitest": "^3.2.7"
+    "vitest": "3.2.7"
   }
 }
