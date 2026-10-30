@@ -42,6 +42,10 @@ npm run dev
 - 本機沒有設定 Google 登入時，`npm run dev` 使用開發模式：登入頁直接選 `dispatcher@example.com` 登入。
 - 正式環境要建立 Google OAuth 用戶端並設定環境變數，步驟見 [docs/auth.md](docs/auth.md)。
 
+### 部署到 GCP
+
+Cloud Run + Cloud SQL（asia-east1），全部在瀏覽器的 Cloud Shell 完成，步驟見 [docs/deploy.md](docs/deploy.md)。
+
 ## 常用指令
 
 | 指令 | 說明 |

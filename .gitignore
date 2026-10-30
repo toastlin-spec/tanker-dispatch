@@ -13,3 +13,4 @@ apps/web/dist/
 apps/api/dist/
 packages/core/dist/
 *.tsbuildinfo
+deploy.env
