@@ -92,9 +92,30 @@ export interface OrderInput {
   note?: string | null;
 }
 
+export interface SessionUser {
+  email: string;
+  name: string | null;
+  picture: string | null;
+}
+
+export interface AuthConfigResponse {
+  mode: 'google' | 'dev';
+  devEmails?: string[];
+}
+
+export interface AllowedUserRow {
+  email: string;
+  note: string | null;
+  addedBy: string | null;
+  createdAt: string;
+  lastLoginAt: string | null;
+  lastName: string | null;
+}
+
 export interface AuditLogRow {
   id: number;
   at: string;
+  actor: string | null;
   action: string;
   entityType: string;
   entityId: string | null;
@@ -109,6 +130,7 @@ export interface PublishedSheet {
   sheet: DispatchSheet;
   warnings: Issue[];
   reason: string | null;
+  publishedBy?: SessionUser | null;
 }
 
 export interface DispatchSheetsResponse {
@@ -127,6 +149,13 @@ export class ApiError extends Error {
   }
 }
 
+let unauthorizedHandler: (() => void) | null = null;
+
+/** 任何 API 回 401（沒登入或已被移出名單）時呼叫，讓畫面回到登入頁。 */
+export function onUnauthorized(handler: (() => void) | null) {
+  unauthorizedHandler = handler;
+}
+
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   let res: Response;
   try {
@@ -140,6 +169,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   }
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
+  if (res.status === 401 && path !== '/auth/me') unauthorizedHandler?.();
   if (!res.ok) {
     throw new ApiError(data?.message ?? `伺服器錯誤（${res.status}）`, res.status, data?.issues);
   }
@@ -154,6 +184,15 @@ const qs = (params: Record<string, string | undefined>) => {
 };
 
 export const api = {
+  me: () => request<SessionUser>('GET', '/auth/me'),
+  authConfig: () => request<AuthConfigResponse>('GET', '/auth/config'),
+  devLogin: (email: string) => request<SessionUser>('POST', '/auth/dev-login', { email }),
+  logout: () => request('POST', '/auth/logout'),
+  users: () => request<{ bootstrap: string[]; users: AllowedUserRow[] }>('GET', '/users'),
+  addUser: (data: { email: string; note?: string | null }) => request<AllowedUserRow>('POST', '/users', data),
+  updateUser: (email: string, data: { note: string | null }) => request<AllowedUserRow>('PATCH', `/users/${encodeURIComponent(email)}`, data),
+  removeUser: (email: string) => request('DELETE', `/users/${encodeURIComponent(email)}`),
+
   master: () => request<Master>('GET', '/master'),
   saveSettings: (settings: Settings) => request<Settings>('PUT', '/settings', settings),
 

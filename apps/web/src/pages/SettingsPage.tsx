@@ -19,6 +19,7 @@ import { api, type LocationRow, type Master } from '../api';
 import { timeToDayjs } from '../dates';
 import { useMaster } from '../queries';
 import { LegsMatrix } from '../settings/LegsMatrix';
+import { UsersTab } from '../settings/UsersTab';
 
 function useSaveSettings() {
   const { message } = App.useApp();
@@ -439,6 +440,7 @@ export function SettingsPage() {
           { key: 'operations', label: '作業時間與倍數', children: <OperationsTab master={master.data} /> },
           { key: 'caps', label: '單數上限', children: <CapsTab master={master.data} /> },
           { key: 'rules', label: '排班規則', children: <RulesTab master={master.data} /> },
+          { key: 'users', label: '使用者（登入名單）', children: <UsersTab /> },
         ]}
       />
     </>

@@ -405,3 +405,8 @@ body,
     break-after: auto;
   }
 }
+
+.app-user {
+  color: #fff;
+  white-space: nowrap;
+}

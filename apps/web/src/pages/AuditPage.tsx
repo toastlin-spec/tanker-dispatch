@@ -13,6 +13,7 @@ const ENTITY_LABELS: Record<string, string> = {
   driver: '司機',
   vehicle: '車輛',
   system: '系統',
+  user: '使用者',
 };
 
 export function AuditPage() {
@@ -36,6 +37,7 @@ export function AuditPage() {
             filters: Object.entries(ENTITY_LABELS).map(([value, text]) => ({ value, text })),
             onFilter: (v, r) => r.entityType === v,
           },
+          { title: '操作者', dataIndex: 'actor', render: (v: string | null) => v ?? '系統', width: 200 },
           { title: '內容', dataIndex: 'summary' },
           {
             title: '警告原因',

@@ -4,12 +4,18 @@ import { useMemo } from 'react';
 import { api, type Master } from './api';
 
 export const keys = {
+  me: ['me'] as const,
+  users: ['users'] as const,
   master: ['master'] as const,
   board: (date: string) => ['board', date] as const,
   orders: (params: object) => ['orders', params] as const,
   sheets: (date: string) => ['sheets', date] as const,
   audit: ['audit'] as const,
 };
+
+export function useMe() {
+  return useQuery({ queryKey: keys.me, queryFn: api.me, retry: false, staleTime: 5 * 60_000 });
+}
 
 export function useMaster() {
   return useQuery({ queryKey: keys.master, queryFn: api.master, staleTime: 30_000 });

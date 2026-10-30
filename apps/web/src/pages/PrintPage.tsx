@@ -107,7 +107,10 @@ function Sheet({ item }: { item: PublishedSheet }) {
         </div>
       )}
       <div className="sign">
-        <span>發布時間：{formatDateTime(item.publishedAt)}</span>
+        <span>
+          發布：{formatDateTime(item.publishedAt)}
+          {item.publishedBy && `（${item.publishedBy.name ?? item.publishedBy.email}）`}
+        </span>
         <span>調度員：＿＿＿＿＿＿</span>
         <span>司機簽名：＿＿＿＿＿＿</span>
       </div>
