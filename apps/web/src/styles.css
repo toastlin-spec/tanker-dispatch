@@ -1,0 +1,412 @@
+:root {
+  --seg-drive: #4c8df6;
+  --seg-load: #f59f00;
+  --seg-unload: #2f9e44;
+  --seg-wait: #adb5bd;
+  --seg-pretrip: #9775fa;
+  --seg-missing: #e03131;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background: #f5f6f8;
+}
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 20px;
+}
+
+.app-title {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.app-content {
+  padding: 16px;
+}
+
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+/* ---- 調度看板 ---- */
+
+.board {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.order-pool {
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+}
+
+.order-card {
+  border: 1px solid #d9dde3;
+  border-left: 4px solid #868e96;
+  border-radius: 6px;
+  background: #fff;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.order-card.gasoline {
+  border-left-color: #1f6feb;
+}
+
+.order-card.diesel {
+  border-left-color: #e8590c;
+}
+
+.order-card.dragging {
+  opacity: 0.4;
+}
+
+.order-card .title {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.order-card .meta {
+  color: #667085;
+  font-size: 12px;
+}
+
+.gantt {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.gantt-inner {
+  min-width: 1100px;
+}
+
+.gantt-axis,
+.gantt-row {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+}
+
+.gantt-axis {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fafbfc;
+  border-bottom: 1px solid #e3e6ea;
+  height: 28px;
+}
+
+.gantt-axis .ticks,
+.gantt-row .track {
+  position: relative;
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #eef0f3;
+  font-size: 11px;
+  color: #8a94a6;
+  padding: 6px 0 0 3px;
+}
+
+.tick.major {
+  border-left-color: #dfe3e8;
+}
+
+.gantt-row {
+  border-bottom: 1px solid #eef0f3;
+  min-height: 96px;
+}
+
+.gantt-row.drop-over {
+  background: #eef5ff;
+  outline: 2px dashed #1f6feb;
+  outline-offset: -2px;
+}
+
+.gantt-row .head {
+  padding: 8px 10px;
+  border-right: 1px solid #eef0f3;
+  font-size: 13px;
+}
+
+.gantt-row .head .name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gantt-row .track-area {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  gap: 6px;
+}
+
+.track {
+  height: 30px;
+}
+
+.track .grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #f1f3f5;
+}
+
+.seg {
+  position: absolute;
+  top: 3px;
+  height: 24px;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 11px;
+  line-height: 24px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+  padding: 0 3px;
+  box-sizing: border-box;
+  cursor: default;
+  border-right: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.seg.drive {
+  background: var(--seg-drive);
+}
+.seg.load {
+  background: var(--seg-load);
+}
+.seg.unload {
+  background: var(--seg-unload);
+}
+.seg.pretrip {
+  background: var(--seg-pretrip);
+}
+.seg.wait {
+  background: repeating-linear-gradient(45deg, #ced4da, #ced4da 4px, #e9ecef 4px, #e9ecef 8px);
+  color: #495057;
+}
+.seg.missing {
+  background: repeating-linear-gradient(45deg, #ffe3e3, #ffe3e3 5px, #ffc9c9 5px, #ffc9c9 10px);
+  border: 1px dashed var(--seg-missing);
+  color: #c92a2a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.legend {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: #495057;
+}
+
+.legend i {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: -1px;
+}
+
+.issue-lines {
+  padding: 0 10px 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.issue-lines .block {
+  color: #c92a2a;
+}
+.issue-lines .warn {
+  color: #b35c00;
+}
+
+.empty-track {
+  color: #98a2b3;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+/* ---- 路段矩陣 ---- */
+
+.leg-matrix {
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.leg-matrix th,
+.leg-matrix td {
+  border: 1px solid #e3e6ea;
+  text-align: center;
+  padding: 0;
+}
+
+.leg-matrix th {
+  background: #fafbfc;
+  padding: 4px 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.leg-matrix th.row-head {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.leg-matrix td button {
+  width: 54px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.leg-matrix td.self {
+  background: #f1f3f5;
+}
+
+.leg-matrix td.src-confirmed {
+  background: #d3f9d8;
+}
+.leg-matrix td.src-excel {
+  background: #e7f5ff;
+}
+.leg-matrix td.src-google_x1\.5 {
+  background: #fff3bf;
+}
+.leg-matrix td.src-estimate {
+  background: #ffe8cc;
+}
+.leg-matrix td.src-manual {
+  background: #f3f0ff;
+}
+.leg-matrix td.empty button {
+  color: #ced4da;
+}
+.leg-matrix td.needed {
+  background: #ffe3e3;
+  outline: 2px solid #e03131;
+  outline-offset: -2px;
+}
+.leg-matrix td.needed button {
+  color: #c92a2a;
+  font-weight: 700;
+}
+.leg-matrix td.focus {
+  outline: 3px solid #1f6feb;
+  outline-offset: -3px;
+}
+
+/* ---- 派車單 ---- */
+
+.sheet {
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin: 0 auto 20px;
+  max-width: 900px;
+}
+
+.sheet h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.sheet table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.sheet th,
+.sheet td {
+  border: 1px solid #d0d5dd;
+  padding: 4px 6px;
+  text-align: left;
+}
+
+.sheet th {
+  background: #f2f4f7;
+}
+
+.sheet .info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px 12px;
+  margin: 10px 0 12px;
+  font-size: 13px;
+}
+
+.sheet .sign {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+  font-size: 13px;
+}
+
+@media print {
+  .no-print,
+  .app-header {
+    display: none !important;
+  }
+  html,
+  body,
+  #root,
+  .app-layout,
+  .app-content {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+  .sheet {
+    border: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    page-break-after: always;
+    break-after: page;
+  }
+  .sheet:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}
+
+.app-user {
+  color: #fff;
+  white-space: nowrap;
+}

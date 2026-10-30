@@ -9,3 +9,7 @@ coverage/
 .DS_Store
 Thumbs.db
 .pg-data/
+apps/web/dist/
+apps/api/dist/
+packages/core/dist/
+*.tsbuildinfo
