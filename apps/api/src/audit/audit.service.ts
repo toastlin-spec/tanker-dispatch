@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { currentUser } from '../auth/request-context';
 import { PrismaService } from '../prisma.service';
 
 export interface AuditEntry {
@@ -9,6 +10,8 @@ export interface AuditEntry {
   summary: string;
   detail?: unknown;
   reason?: string | null;
+  /** 預設為目前登入者。 */
+  actor?: string | null;
 }
 
 @Injectable()
@@ -18,6 +21,7 @@ export class AuditService {
   log(entry: AuditEntry, tx: Prisma.TransactionClient = this.prisma) {
     return tx.auditLog.create({
       data: {
+        actor: entry.actor !== undefined ? entry.actor : currentUser()?.email ?? null,
         action: entry.action,
         entityType: entry.entityType,
         entityId: entry.entityId ?? null,

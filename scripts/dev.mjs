@@ -10,6 +10,7 @@
  *   --no-serve   只準備資料庫，不啟動 API 與前端
  */
 import { spawn, spawnSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { userInfo } from 'node:os';
@@ -162,8 +163,21 @@ async function shutdown(code = 0) {
 process.on('SIGINT', () => void shutdown(0));
 process.on('SIGTERM', () => void shutdown(0));
 
+/** 本機沒有設定 Google 登入時改用開發模式；正式環境（Cloud Run）不能用開發模式，API 會拒絕啟動。 */
+function prepareAuthEnv() {
+  if (!process.env.GOOGLE_CLIENT_ID && !process.env.AUTH_MODE) {
+    process.env.AUTH_MODE = 'dev';
+    process.env.AUTH_BOOTSTRAP_EMAILS ??= 'dispatcher@example.com';
+    log('dev', `沒有設定 GOOGLE_CLIENT_ID，使用開發模式登入（不經過 Google）：可用 ${process.env.AUTH_BOOTSTRAP_EMAILS} 登入`);
+  }
+  process.env.PUBLIC_URL ??= `http://localhost:${WEB_PORT}`;
+  // 每次啟動產生新的密鑰：重新執行 npm run dev 後要重新登入。
+  process.env.SESSION_SECRET ??= randomBytes(32).toString('hex');
+}
+
 async function main() {
   loadDotEnv();
+  prepareAuthEnv();
   if (!process.env.DATABASE_URL) {
     process.env.DATABASE_URL = await startEmbeddedPostgres();
   } else {
@@ -187,10 +201,15 @@ async function main() {
   const tsc = require.resolve('typescript/bin/tsc');
   const vitePkg = require.resolve('vite/package.json', { paths: [join(root, 'apps/web')] });
   const vite = join(dirname(vitePkg), JSON.parse(readFileSync(vitePkg, 'utf8')).bin.vite);
-  run('api', process.execPath, [tsc, '-p', 'tsconfig.build.json'], apiDir);
   serve('core', process.execPath, [tsc, '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], join(root, 'packages/core'));
-  serve('api', process.execPath, [tsc, '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], apiDir);
-  serve('api', process.execPath, ['--watch', 'dist/main.js'], apiDir, { PORT: String(API_PORT) });
+  // 等 API 第一次編譯完成才啟動，避免啟動後又因為重新輸出檔案而馬上重啟。
+  const apiWatch = serve('api', process.execPath, [tsc, '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], apiDir);
+  let apiStarted = false;
+  apiWatch.stdout.on('data', (chunk) => {
+    if (apiStarted || !/Watching for file changes/.test(String(chunk))) return;
+    apiStarted = true;
+    serve('api', process.execPath, ['--watch', 'dist/main.js'], apiDir, { PORT: String(API_PORT) });
+  });
   serve('web', process.execPath, [vite, '--port', String(WEB_PORT), '--strictPort', '--host'], join(root, 'apps/web'), { API_PORT: String(API_PORT) });
   log('dev', `開發環境啟動中：前端 http://localhost:${WEB_PORT}　API http://localhost:${API_PORT}/api（按 Ctrl+C 結束）`);
 }

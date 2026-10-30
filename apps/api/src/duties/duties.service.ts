@@ -10,6 +10,7 @@ import {
   type TripPlan,
 } from '@tanker/core';
 import { AuditService } from '../audit/audit.service';
+import { currentUser } from '../auth/request-context';
 import { fromDbDate, toDbDate } from '../common/dates';
 import { MasterService } from '../master/master.service';
 import { syncOrderStatuses } from '../orders/order-status';
@@ -206,6 +207,7 @@ export class DutiesService {
       warnings: check.warnings,
       reason: check.needsReason ? trimmed : null,
       publishedAt: new Date().toISOString(),
+      publishedBy: currentUser(),
     };
     await this.prisma.$transaction(async (tx) => {
       await tx.duty.update({ where: { id }, data: { status: 'published', snapshot: snapshot as object, publishedAt: new Date() } });

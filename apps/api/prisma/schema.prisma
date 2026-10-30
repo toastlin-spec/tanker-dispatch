@@ -171,6 +171,8 @@ model Setting {
 model AuditLog {
   id         Int      @id @default(autoincrement())
   at         DateTime @default(now())
+  /// 操作者的 Google 帳號 email；系統自動產生的紀錄為 null
+  actor      String?
   action     String
   entityType String
   entityId   String?
@@ -180,4 +182,16 @@ model AuditLog {
 
   @@index([entityType, entityId])
   @@index([at])
+}
+
+/// 允許登入的 Google 帳號。另外部署設定 AUTH_BOOTSTRAP_EMAILS 的帳號也一律允許。
+model AllowedUser {
+  /// 小寫的 email
+  email       String    @id
+  note        String?
+  /// 加入者的 email
+  addedBy     String?
+  createdAt   DateTime  @default(now())
+  lastLoginAt DateTime?
+  lastName    String?
 }

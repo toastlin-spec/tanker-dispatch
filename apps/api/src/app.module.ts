@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AuditController } from './audit/audit.controller';
 import { AuditService } from './audit/audit.service';
+import { AuthController } from './auth/auth.controller';
+import { AuthGuard } from './auth/auth.guard';
+import { AuthService } from './auth/auth.service';
+import { UsersController } from './auth/users.controller';
 import { DutiesController } from './duties/duties.controller';
 import { DutiesService } from './duties/duties.service';
 import { PlanningService } from './duties/planning.service';
@@ -11,7 +16,15 @@ import { PrismaService } from './prisma.service';
 import { HealthController } from './health.controller';
 
 @Module({
-  controllers: [HealthController, MasterController, OrdersController, DutiesController, AuditController],
-  providers: [PrismaService, AuditService, MasterService, PlanningService, DutiesService],
+  controllers: [HealthController, AuthController, UsersController, MasterController, OrdersController, DutiesController, AuditController],
+  providers: [
+    PrismaService,
+    AuditService,
+    AuthService,
+    { provide: APP_GUARD, useClass: AuthGuard },
+    MasterService,
+    PlanningService,
+    DutiesService,
+  ],
 })
 export class AppModule {}

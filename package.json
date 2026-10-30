@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "npm run build -w @tanker/core && npm run build -w @tanker/api && npm run build -w @tanker/web",
-    "test": "npm test -w @tanker/core",
+    "test": "npm test -w @tanker/core && npm test -w @tanker/api",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "db:reset": "node scripts/dev.mjs --reset-db --no-serve"
   },
