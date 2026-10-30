@@ -6,7 +6,7 @@
  *   3. 同時啟動 API（http://localhost:3000）與前端（http://localhost:5173）。
  *
  * 參數：
- *   --reset-db   清空資料庫（prisma migrate reset）並重新匯入 data/*.json
+ *   --reset-db   清空所有資料表並重新匯入 data/*.json
  *   --no-serve   只準備資料庫，不啟動 API 與前端
  */
 import { spawn, spawnSync } from 'node:child_process';
@@ -160,13 +160,9 @@ async function main() {
   const apiDir = join(root, 'apps/api');
   run('core', npm, ['run', 'build', '-w', '@tanker/core']);
   run('api', npx, ['prisma', 'generate'], apiDir);
-  if (RESET) {
-    run('api', npx, ['prisma', 'migrate', 'reset', '--force', '--skip-seed'], apiDir);
-    run('api', npx, ['tsx', 'prisma/seed.ts', '--force'], apiDir);
-  } else {
-    run('api', npx, ['prisma', 'migrate', 'deploy'], apiDir);
-    run('api', npx, ['tsx', 'prisma/seed.ts'], apiDir);
-  }
+  run('api', npx, ['prisma', 'migrate', 'deploy'], apiDir);
+  // --reset-db：清空所有資料表後重新匯入 data/*.json。
+  run('api', npx, ['tsx', 'prisma/seed.ts', ...(RESET ? ['--force'] : [])], apiDir);
 
   if (!SERVE) {
     await stopEmbeddedPostgres();
