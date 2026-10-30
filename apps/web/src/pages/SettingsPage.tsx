@@ -285,7 +285,7 @@ function CapsTab({ master }: { master: Master }) {
   const update = (i: number, patch: Partial<OrderCap>) => setCaps((c) => c.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   return (
     <div style={{ maxWidth: 640 }}>
-      <Typography.Paragraph type="secondary">超過上限時依「排班規則」的設定顯示警告或阻擋。拆成多趟的同一張訂單算 1 單。</Typography.Paragraph>
+      <Typography.Paragraph type="secondary">單數以車趟計算：一趟送兩站算 1 單；超過 30KL 拆成兩趟算 2 單。超過上限時依「排班規則」的設定顯示警告或阻擋。</Typography.Paragraph>
       <Table<OrderCap & { idx: number }>
         rowKey="idx"
         size="small"

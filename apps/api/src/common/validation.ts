@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { isDateString, isTimeString } from '@tanker/core';
+import { PRODUCTS, isDateString, isTimeString, type Product } from '@tanker/core';
 import { z, type ZodTypeAny } from 'zod';
 
 /** 欄位的中文名稱，用在驗證錯誤訊息。 */
@@ -74,7 +74,7 @@ export function parseBody<T extends ZodTypeAny>(schema: T, body: unknown): z.inf
 
 export const zTime = z.string().refine((v) => isTimeString(v), { message: '時間格式應為 HH:MM' });
 export const zDate = z.string().refine((v) => isDateString(v), { message: '日期格式應為 YYYY-MM-DD' });
-export const zProduct = z.enum(['92', '95', 'diesel']);
+export const zProduct = z.enum(PRODUCTS as [Product, ...Product[]]);
 export const zOptionalText = z
   .string()
   .trim()

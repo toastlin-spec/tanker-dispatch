@@ -58,7 +58,7 @@ export interface Vehicle {
   compartmentsKL: number[];
 }
 
-export type Product = '92' | '95' | 'diesel';
+export type Product = '92' | '95' | '98' | 'diesel';
 export type ProductFamily = 'gasoline' | 'diesel';
 export type OrderStatus = 'pending' | 'scheduled' | 'completed' | 'cancelled';
 
@@ -236,7 +236,8 @@ export interface DutyEvaluation {
   timeline: DutyTimeline;
   issues: Issue[];
   status: DutyStatusColor;
-  orderCount: number;
+  /** 單數：以車趟計算（一趟送兩站算 1 單，拆成兩趟算 2 單）。 */
+  tripCount: number;
   compartmentsKL: number[];
   vehicleId: string | null;
 }

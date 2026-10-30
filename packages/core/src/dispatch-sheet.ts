@@ -30,7 +30,8 @@ export interface DispatchSheet {
   start: string;
   end: string | null;
   totalKL: number;
-  orderCount: number;
+  /** 單數（車趟數）。 */
+  tripCount: number;
   rows: DispatchSheetRow[];
   trips: DispatchSheetTrip[];
   missingLegs: string[];
@@ -103,7 +104,7 @@ export function buildDispatchSheet(evaluation: DutyEvaluation, ctx: PlanningCont
     start: formatMinutes(timeline.start),
     end: timeline.end === null ? null : formatMinutes(timeline.end),
     totalKL: Math.round(totalKL * 1000) / 1000,
-    orderCount: evaluation.orderCount,
+    tripCount: evaluation.tripCount,
     rows,
     trips: sheetTrips,
     missingLegs: timeline.missingLegs.map((l) => `${name(l.fromId)}→${name(l.toId)}`),
