@@ -88,6 +88,7 @@ export function OrderPool(props: {
             { value: 'all', label: '全部' },
             { value: '92', label: '92' },
             { value: '95', label: '95' },
+            { value: '98', label: '98' },
             { value: 'diesel', label: '柴油' },
           ]}
         />

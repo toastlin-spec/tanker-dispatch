@@ -1,5 +1,5 @@
 import { locationName, resolveDuty, type PlanningContext } from './context';
-import { dutyOrderIds, validateTripLoading } from './loading';
+import { dutyOrderIds, dutyTripCount, validateTripLoading } from './loading';
 import { missingLegMessage } from './legs';
 import { absoluteMinutes, addDays, dayNumber, formatDateShort, formatDuration, formatMinutes, monthOf, parseTime } from './time';
 import { buildTimeline } from './timeline';
@@ -33,7 +33,7 @@ export const RULE_DESCRIPTIONS: Record<RuleKey, string> = {
   minRestBetweenDutiesHours: '前一天最後一趟回到出發廠，到隔天第一趟出車的最少間隔（跨日檢查，大夜班也適用）',
   stationOpeningHours: '卸油不能超過關門時間（開門前會自動等待）',
   missingLeg: '無法計算時間的班表不可發布',
-  orderCaps: '每日單數上限（見「單數上限」）',
+  orderCaps: '每日單數上限，以車趟計算：一趟送兩站算 1 單，拆成兩趟算 2 單（上限見「單數上限」）',
   dailyDrivingHours: '每日駕車時數上限（汽車運輸業管理規則第 19-2 條）',
   continuousDriving: '連續駕車時數上限與休息時間（第 19-2 條）；只有「等待」算休息，灌油卸油不算',
   dailyWorkHours: '每日工時上限，從出車算到收車（勞基法第 32 條）',
@@ -184,10 +184,10 @@ function checkDuty(entry: ComputedDuty, book: DutyBook, ctx: PlanningContext): I
     }
   }
 
-  // 每日單數上限。
+  // 每日單數上限：單數以車趟計算。
   const capsLevel = enabledLevel(rules, 'orderCaps');
   if (capsLevel && entry.hasWork) {
-    const count = dutyOrderIds(plan).length;
+    const count = dutyTripCount(plan);
     for (const cap of ctx.settings.orderCaps) {
       if (cap.depotId !== resolved.depotId) continue;
       if (cap.scope === 'perDriver' && count > cap.maxOrders) {
@@ -195,21 +195,21 @@ function checkDuty(entry: ComputedDuty, book: DutyBook, ctx: PlanningContext): I
           rule: 'orderCaps',
           level: capsLevel,
           message: `今日 ${count} 單，超過${name(cap.depotId)}每位司機每日上限 ${cap.maxOrders} 單`,
-          suggestion: '把部分訂單改派其他司機或其他日期',
+          suggestion: '把部分車趟改派其他司機或其他日期，或把同一區的兩站併成一趟',
         });
       }
       if (cap.scope === 'depotTotal') {
-        const ids = new Set<string>();
+        let total = 0;
         for (const other of book.onDate(plan.date)) {
           if (ctx.drivers.get(other.plan.driverId)?.homeDepotId !== cap.depotId) continue;
-          for (const id of dutyOrderIds(other.plan)) ids.add(id);
+          total += dutyTripCount(other.plan);
         }
-        if (ids.size > cap.maxOrders) {
+        if (total > cap.maxOrders) {
           issues.push({
             rule: 'orderCaps',
             level: capsLevel,
-            message: `${name(cap.depotId)}今日合計 ${ids.size} 單，超過上限 ${cap.maxOrders} 單`,
-            suggestion: '把部分訂單改派其他廠或其他日期',
+            message: `${name(cap.depotId)}今日合計 ${total} 單，超過上限 ${cap.maxOrders} 單`,
+            suggestion: '把部分車趟改派其他廠或其他日期，或把同一區的兩站併成一趟',
           });
         }
       }
@@ -399,7 +399,7 @@ export function evaluateDuties(
       timeline: entry.timeline,
       issues: sorted,
       status: statusColor(sorted),
-      orderCount: dutyOrderIds(entry.plan).length,
+      tripCount: dutyTripCount(entry.plan),
       compartmentsKL: resolved.compartmentsKL,
       vehicleId: resolved.vehicleId,
     });

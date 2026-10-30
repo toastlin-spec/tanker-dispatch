@@ -7,7 +7,8 @@ export function productFamily(product: Product): ProductFamily {
   return product === 'diesel' ? 'diesel' : 'gasoline';
 }
 
-export const PRODUCT_LABELS: Record<Product, string> = { '92': '92 無鉛', '95': '95 無鉛', diesel: '柴油' };
+export const PRODUCTS: Product[] = ['92', '95', '98', 'diesel'];
+export const PRODUCT_LABELS: Record<Product, string> = { '92': '92 無鉛', '95': '95 無鉛', '98': '98 無鉛', diesel: '柴油' };
 export const PRODUCT_FAMILY_LABELS: Record<ProductFamily, string> = { gasoline: '汽油', diesel: '柴油' };
 
 function roundKL(value: number): number {
@@ -91,6 +92,11 @@ export function assignedQuantity(plan: DutyPlan, orderId: string): number {
   let sum = 0;
   for (const t of plan.trips) for (const d of t.drops) if (d.orderId === orderId) sum += d.quantityKL;
   return roundKL(sum);
+}
+
+/** 單數 = 車趟數（使用者確認：一趟送兩站算 1 單，超過 30KL 拆成兩趟算 2 單）。 */
+export function dutyTripCount(plan: DutyPlan): number {
+  return plan.trips.filter((t) => t.drops.length > 0).length;
 }
 
 export function dutyOrderIds(plan: DutyPlan): string[] {

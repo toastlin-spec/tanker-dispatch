@@ -265,34 +265,52 @@ describe('缺少路段時間', () => {
   });
 });
 
-describe('每日單數上限', () => {
-  function stations(n: number, date = DATE) {
-    const ids = ['st-qingshui', 'st-changhua', 'st-miaoli', 'st-taichung-jiaotong', 'st-qingshui', 'st-changhua', 'st-miaoli'];
-    return ids.slice(0, n).map((s) => order(s, '92', 5, { date }));
+describe('每日單數上限（以車趟計算）', () => {
+  /** 一個站一趟，n 趟。 */
+  function trips(n: number, date = DATE) {
+    const ids = ['st-qingshui', 'st-changhua', 'st-miaoli', 'st-qingshui', 'st-changhua'];
+    const orders = ids.slice(0, n).map((s) => order(s, '92', 5, { date }));
+    return { orders, trips: orders.map((o) => trip(drop(o))) };
   }
 
-  it('台中廠每位司機 3 單通過、4 單警告', () => {
-    const three = stations(3);
-    const ok = duty('d1', DATE, '05:00', [trip(drop(three[0], [0]), drop(three[1], [1])), trip(drop(three[2]))]);
-    expect(ofRule(issuesOf([ok], three), 'orderCaps')).toEqual([]);
-
-    const four = stations(4);
-    const over = duty('d1', DATE, '05:00', [trip(drop(four[0], [0]), drop(four[1], [1])), trip(drop(four[2], [0]), drop(four[3], [1]))]);
-    const issues = ofRule(issuesOf([over], four), 'orderCaps');
-    expect(issues).toEqual([
-      expect.objectContaining({ level: 'warn', message: '今日 4 單，超過台中廠每位司機每日上限 3 單' }),
-    ]);
+  it('台中廠每位司機 3 趟通過、4 趟警告', () => {
+    const three = trips(3);
+    expect(ofRule(issuesOf([duty('d1', DATE, '04:00', three.trips)], three.orders), 'orderCaps')).toEqual([]);
+    const four = trips(4);
+    const issues = ofRule(issuesOf([duty('d1', DATE, '04:00', four.trips)], four.orders), 'orderCaps');
+    expect(issues).toEqual([expect.objectContaining({ level: 'warn', message: '今日 4 單，超過台中廠每位司機每日上限 3 單' })]);
   });
 
-  it('麥寮廠 3 位司機合計 6 單通過、7 單警告', () => {
+  it('一趟送兩站只算 1 單：第三趟送清水梧棲 92 15KL 與彰化 95 10KL，共 3 單通過', () => {
+    const a = order('st-miaoli', '92', 30);
+    const b = order('st-miaoli', '95', 30);
+    const c = order('st-qingshui', '92', 15);
+    const d = order('st-changhua', '95', 10);
+    const plan = duty('d1', DATE, '04:00', [trip(drop(a, [0, 1])), trip(drop(b, [0, 1])), trip(drop(c, [0]), drop(d, [1]))]);
+    const ev = evaluate([plan], [a, b, c, d]).get(plan.id)!;
+    expect(ev.tripCount).toBe(3);
+    expect(ofRule(ev.issues, 'orderCaps')).toEqual([]);
+  });
+
+  it('超過 30KL 拆成兩趟的訂單算 2 單', () => {
+    const big = order('st-qingshui', '92', 60);
+    const more = trips(2);
+    const plan = duty('d1', DATE, '04:00', [trip(drop(big, [0, 1], 30)), trip(drop(big, [0, 1], 30)), ...more.trips]);
+    const ev = evaluate([plan], [big, ...more.orders]).get(plan.id)!;
+    expect(ev.tripCount).toBe(4);
+    expect(ofRule(ev.issues, 'orderCaps')).toEqual([expect.objectContaining({ message: '今日 4 單，超過台中廠每位司機每日上限 3 單' })]);
+  });
+
+  it('麥寮廠 3 位司機合計 6 趟通過、7 趟警告', () => {
     const south = ['st-mailiao', 'st-jiatai', 'st-jiayi', 'st-liujia', 'st-yanchao', 'st-chaozhou', 'st-mailiao'];
     const orders = south.map((s) => order(s, 'diesel', 5));
-    const d2 = duty('d2', DATE, '06:00', [trip(drop(orders[0], [0]), drop(orders[1], [1]))]);
-    const d3 = duty('d3', DATE, '06:00', [trip(drop(orders[2], [0]), drop(orders[3], [1]))]);
-    const d4six = duty('d4', DATE, '00:00', [trip(drop(orders[4], [0]), drop(orders[5], [1]))]);
+    const t = orders.map((o) => trip(drop(o)));
+    const d2 = duty('d2', DATE, '06:00', [t[0], t[1]]);
+    const d3 = duty('d3', DATE, '06:00', [t[2], t[3]]);
+    const d4six = duty('d4', DATE, '00:00', [t[4], t[5]]);
     expect(ofRule(issuesOf([d2, d3, d4six], orders, undefined, 'd2-' + DATE), 'orderCaps')).toEqual([]);
 
-    const d4seven = duty('d4', DATE, '00:00', [trip(drop(orders[4], [0]), drop(orders[5], [1])), trip(drop(orders[6]))]);
+    const d4seven = duty('d4', DATE, '00:00', [t[4], t[5], t[6]]);
     const result = evaluate([d2, d3, d4seven], orders);
     for (const id of ['d2', 'd3', 'd4']) {
       expect(ofRule(result.get(`${id}-${DATE}`)!.issues, 'orderCaps')).toEqual([
@@ -301,27 +319,14 @@ describe('每日單數上限', () => {
     }
   });
 
-  it('拆成多趟的同一張單只算 1 單', () => {
-    const big = order('st-qingshui', '92', 60);
-    const others = stations(2);
-    const plan = duty('d1', DATE, '05:00', [
-      trip(drop(big, [0, 1], 30)),
-      trip(drop(big, [0, 1], 30)),
-      trip(drop(others[0], [0]), drop(others[1], [1])),
-    ]);
-    const ev = evaluate([plan], [big, ...others]).get(plan.id)!;
-    expect(ev.orderCount).toBe(3);
-    expect(ofRule(ev.issues, 'orderCaps')).toEqual([]);
-  });
-
   it('上限可設定，規則可關閉', () => {
-    const three = stations(3);
-    const plan = duty('d1', DATE, '05:00', [trip(drop(three[0], [0]), drop(three[1], [1])), trip(drop(three[2]))]);
+    const two = trips(2);
+    const plan = duty('d1', DATE, '04:00', two.trips);
     const settings = baseSettings();
-    settings.orderCaps = settings.orderCaps.map((c) => (c.depotId === 'taichung-depot' ? { ...c, maxOrders: 2 } : c));
-    expect(ofRule(issuesOf([plan], three, settings), 'orderCaps')).toHaveLength(1);
+    settings.orderCaps = settings.orderCaps.map((c) => (c.depotId === 'taichung-depot' ? { ...c, maxOrders: 1 } : c));
+    expect(ofRule(issuesOf([plan], two.orders, settings), 'orderCaps')).toHaveLength(1);
     settings.rules.orderCaps.enabled = false;
-    expect(ofRule(issuesOf([plan], three, settings), 'orderCaps')).toEqual([]);
+    expect(ofRule(issuesOf([plan], two.orders, settings), 'orderCaps')).toEqual([]);
   });
 });
 
@@ -404,7 +409,7 @@ describe('狀態顏色與發布', () => {
 
   it('只有警告：黃燈，要填原因才能發布', () => {
     const four = ['st-qingshui', 'st-changhua', 'st-miaoli', 'st-qingshui'].map((s) => order(s, '92', 5));
-    const plan = duty('d1', DATE, '04:00', [trip(drop(four[0], [0]), drop(four[1], [1])), trip(drop(four[2], [0]), drop(four[3], [1]))]);
+    const plan = duty('d1', DATE, '03:00', four.map((o) => trip(drop(o))));
     const ev = evaluate([plan], four).get(plan.id)!;
     expect(ev.status).toBe('yellow');
     expect(checkPublish(ev)).toMatchObject({ canPublish: true, needsReason: true });
@@ -440,8 +445,8 @@ describe('看板彙整', () => {
     ]);
     expect(board.assignedOrderIds).toEqual(new Set(orders.map((o) => o.id)));
     expect(board.depotTotals).toEqual([
-      { depotId: 'taichung-depot', orderCount: 2, maxOrders: 3, scope: 'perDriver' },
-      { depotId: 'mailiao-depot', orderCount: 0, maxOrders: 6, scope: 'depotTotal' },
+      { depotId: 'taichung-depot', tripCount: 2, maxOrders: 3, scope: 'perDriver' },
+      { depotId: 'mailiao-depot', tripCount: 0, maxOrders: 6, scope: 'depotTotal' },
     ]);
   });
 });

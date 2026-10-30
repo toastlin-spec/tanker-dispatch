@@ -68,6 +68,31 @@ describe('拖單排入班表', () => {
     expect(plan.trips.map((t) => t.drops.map((d) => d.stationId))).toEqual([['st-changhua', 'st-qingshui'], ['st-miaoli']]);
   });
 
+  it('98 無鉛屬於汽油：同站 92 15KL 與 98 10KL 併入同一趟、各用一艙', () => {
+    const a = order('st-qingshui', '92', 15);
+    const b = order('st-qingshui', '98', 10);
+    let plan = assign(duty('d1', '2026-11-02', '06:00', []), a, [a, b]);
+    plan = assign(plan, b, [a, b]);
+    expect(plan.trips).toHaveLength(1);
+    expect(plan.trips[0].drops.map((d) => d.compartmentIdx)).toEqual([[0], [1]]);
+  });
+
+  it('92 送清水梧棲、98 送彰化，併成一趟送兩站', () => {
+    const a = order('st-qingshui', '92', 15);
+    const b = order('st-changhua', '98', 10);
+    let plan = assign(duty('d1', '2026-11-02', '06:00', []), a, [a, b]);
+    plan = assign(plan, b, [a, b]);
+    expect(plan.trips.map((t) => t.drops.map((d) => d.stationId))).toEqual([['st-qingshui', 'st-changhua']]);
+  });
+
+  it('98 和柴油不同趟', () => {
+    const a = order('st-changhua', '98', 10);
+    const b = order('st-changhua', 'diesel', 10);
+    let plan = assign(duty('d1', '2026-11-02', '06:00', []), a, [a, b]);
+    plan = assign(plan, b, [a, b]);
+    expect(plan.trips).toHaveLength(2);
+  });
+
   it('汽油和柴油不同趟', () => {
     const a = order('st-changhua', '92', 10);
     const b = order('st-changhua', 'diesel', 10);

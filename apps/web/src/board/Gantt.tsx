@@ -163,11 +163,14 @@ export function GanttRow(props: {
         <div style={{ marginTop: 4 }}>
           <Space size={6} wrap>
             <span>
-              單數 <b>{ev?.orderCount ?? 0}</b>
+              <Tooltip title="單數以車趟計算：一趟送兩站算 1 單">
+                <span>單數</span>
+              </Tooltip>{' '}
+              <b>{ev?.tripCount ?? 0}</b>
               {cap?.scope === 'perDriver' && ` / ${cap.maxOrders}`}
               {cap?.scope === 'depotTotal' && depotTotal && (
                 <span style={{ color: '#667085' }}>
-                  （{locationName(ctx, row.driver.homeDepotId).replace('廠', '')}合計 {depotTotal.orderCount}/{cap.maxOrders}）
+                  （{locationName(ctx, row.driver.homeDepotId).replace('廠', '')}合計 {depotTotal.tripCount}/{cap.maxOrders}）
                 </span>
               )}
             </span>

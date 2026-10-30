@@ -57,7 +57,7 @@ function Sheet({ item }: { item: PublishedSheet }) {
         <div>艙位：{s.vehicle ? `${s.vehicle.compartmentsKL.join(' + ')} KL` : '—'}</div>
         <div>出車：<b>{s.start}</b></div>
         <div>收車：<b>{s.end ?? '無法計算'}</b></div>
-        <div>單數：{s.orderCount} 單</div>
+        <div>單數：{s.tripCount} 單（趟）</div>
         <div>總量：{s.totalKL} KL</div>
       </div>
       <table>

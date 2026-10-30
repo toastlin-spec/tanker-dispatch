@@ -18,7 +18,7 @@ describe('派車單內容', () => {
       start: '00:00',
       end: '08:20',
       totalKL: 57,
-      orderCount: 3,
+      tripCount: 2,
       missingLegs: [],
     });
     expect(sheet.rows.map((r) => `${r.start} ${r.kindLabel} ${r.place} ${r.detail}`.trim())).toEqual([

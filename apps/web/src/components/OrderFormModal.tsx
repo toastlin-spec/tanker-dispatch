@@ -1,4 +1,4 @@
-import { PRODUCT_LABELS, REGION_LABELS, type Product, type Region } from '@tanker/core';
+import { PRODUCTS, PRODUCT_LABELS, REGION_LABELS, type Product, type Region } from '@tanker/core';
 import { App, DatePicker, Form, Input, InputNumber, Modal, Radio, Select, TimePicker, Typography } from 'antd';
 import type { Dayjs } from 'dayjs';
 import { useEffect } from 'react';
@@ -87,7 +87,7 @@ export function OrderFormModal(props: {
           <DatePicker style={{ width: '100%' }} disabled={locked} allowClear={false} />
         </Form.Item>
         <Form.Item name="product" label="油品" rules={[{ required: true, message: '請選擇油品' }]}>
-          <Radio.Group disabled={locked} optionType="button" options={(['92', '95', 'diesel'] as Product[]).map((p) => ({ value: p, label: PRODUCT_LABELS[p] }))} />
+          <Radio.Group disabled={locked} optionType="button" options={PRODUCTS.map((p) => ({ value: p, label: PRODUCT_LABELS[p] }))} />
         </Form.Item>
         <Form.Item
           name="quantityKL"

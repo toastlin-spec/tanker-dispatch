@@ -1,5 +1,5 @@
 import { createContext, type PlanningContext } from './context';
-import { dutyOrderIds } from './loading';
+import { dutyOrderIds, dutyTripCount } from './loading';
 import { evaluateDuties } from './rules';
 import type { DateString, Driver, DutyEvaluation, DutyPlan, PlanningData } from './types';
 
@@ -10,7 +10,8 @@ export interface BoardRow {
 
 export interface DepotOrderTotal {
   depotId: string;
-  orderCount: number;
+  /** 全廠合計單數（車趟數）。 */
+  tripCount: number;
   maxOrders: number | null;
   scope: 'perDriver' | 'depotTotal' | null;
 }
@@ -41,13 +42,13 @@ export function evaluateBoard(date: DateString, data: PlanningData, duties: Duty
 
   const depotIds = [...new Set(data.drivers.map((d) => d.homeDepotId))];
   const depotTotals = depotIds.map((depotId) => {
-    const ids = new Set<string>();
+    let tripCount = 0;
     for (const row of rows) {
       if (row.driver.homeDepotId !== depotId || !row.evaluation) continue;
-      for (const id of dutyOrderIds(row.evaluation.duty)) ids.add(id);
+      tripCount += dutyTripCount(row.evaluation.duty);
     }
     const cap = data.settings.orderCaps.find((c) => c.depotId === depotId);
-    return { depotId, orderCount: ids.size, maxOrders: cap?.maxOrders ?? null, scope: cap?.scope ?? null };
+    return { depotId, tripCount, maxOrders: cap?.maxOrders ?? null, scope: cap?.scope ?? null };
   });
 
   return { date, rows, depotTotals, assignedOrderIds };
