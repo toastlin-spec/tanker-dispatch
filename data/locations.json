@@ -1,0 +1,19 @@
+[
+  { "id": "taichung-depot", "name": "台中廠", "type": "depot", "region": "central", "address": "臺中市梧棲區草湳里自立路568號", "googleName": "山隆通運股份有限公司（台中廠）", "lat": 24.243398, "lng": 120.5272103, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": "changbin" },
+  { "id": "mailiao-depot", "name": "麥寮廠", "type": "depot", "region": "south", "address": "雲林縣麥寮鄉工業路651號", "googleName": "台通麥寮", "lat": 23.790235, "lng": 120.2468933, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": "r89" },
+
+  { "id": "changbin", "name": "彰濱廠", "type": "loading", "region": "central", "address": "彰化縣鹿港鎮東石里鹿工南三路2號", "googleName": "台塑石化股份有限公司彰濱摻配廠", "lat": 24.0766465, "lng": 120.3978557, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": null },
+  { "id": "r89", "name": "R89廠", "type": "loading", "region": "south", "address": "雲林縣麥寮鄉（台塑石化油品部麥寮成品課）", "googleName": "台塑石化油品部麥寮成品課(R89灌裝站)", "lat": 23.79627, "lng": 120.1924457, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": null },
+
+  { "id": "st-miaoli", "name": "苗栗站", "type": "station", "region": "central", "address": "苗栗縣銅鑼鄉中平村中隆一路1號", "googleName": "山隆加油站 苗栗站(台塑)", "lat": 24.4949046, "lng": 120.8008931, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": "changbin" },
+  { "id": "st-qingshui", "name": "清水梧棲站", "type": "station", "region": "central", "address": "臺中市清水區臨江里臨港路六段286號", "googleName": null, "lat": 24.2932556, "lng": 120.5513836, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": "changbin" },
+  { "id": "st-changhua", "name": "彰化站", "type": "station", "region": "central", "address": "彰化縣彰化市南興里中山路一段66號", "googleName": "山隆 彰化加油站 (台塑)", "lat": 24.054019, "lng": 120.534007, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": "changbin" },
+  { "id": "st-taichung-jiaotong", "name": "台中交通站", "type": "station", "region": "central", "address": "臺中市沙鹿區犁分里中山路4號之72號", "googleName": "弘昌交通公司", "lat": 24.2473965, "lng": 120.5899566, "hours24": false, "openTime": "08:00", "closeTime": "17:00", "defaultLoadingId": "changbin" },
+
+  { "id": "st-mailiao", "name": "麥寮站", "type": "station", "region": "south", "address": "雲林縣麥寮鄉工業路651號", "googleName": "山隆加油站 麥寮站 (台塑)", "lat": null, "lng": null, "hours24": false, "openTime": "05:00", "closeTime": "22:00", "defaultLoadingId": "r89" },
+  { "id": "st-jiayi", "name": "嘉益站", "type": "station", "region": "south", "address": "嘉義市西區北新里世賢路一段136號", "googleName": null, "lat": null, "lng": null, "hours24": false, "openTime": "07:00", "closeTime": "22:00", "defaultLoadingId": "r89" },
+  { "id": "st-jiatai", "name": "嘉泰站", "type": "station", "region": "south", "address": "嘉義縣太保市過溝里北港路二段508號", "googleName": null, "lat": null, "lng": null, "hours24": false, "openTime": "06:00", "closeTime": "22:00", "defaultLoadingId": "r89" },
+  { "id": "st-liujia", "name": "六甲站", "type": "station", "region": "south", "address": "臺南市六甲區龜港里里村2鄰21號", "googleName": "山隆加油站 六甲站(台塑)", "lat": null, "lng": null, "hours24": true, "openTime": null, "closeTime": null, "defaultLoadingId": "r89" },
+  { "id": "st-yanchao", "name": "燕巢站", "type": "station", "region": "south", "address": "高雄市燕巢區瓊林里安招路730號", "googleName": null, "lat": null, "lng": null, "hours24": false, "openTime": "06:00", "closeTime": "22:00", "defaultLoadingId": "r89" },
+  { "id": "st-chaozhou", "name": "潮州站", "type": "station", "region": "south", "address": "屏東縣潮州鎮三共里四維路583號", "googleName": null, "lat": null, "lng": null, "hours24": false, "openTime": "06:00", "closeTime": "23:00", "defaultLoadingId": "r89" }
+]

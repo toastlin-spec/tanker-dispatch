@@ -1,0 +1,15 @@
+{
+  "_說明": "佔位資料，使用者會在設定頁改成真實姓名與車牌。",
+  "vehicles": [
+    { "id": "v1", "name": "車1", "tractorPlate": null, "trailerPlate": null, "compartmentsKL": [15, 15] },
+    { "id": "v2", "name": "車2", "tractorPlate": null, "trailerPlate": null, "compartmentsKL": [15, 15] },
+    { "id": "v3", "name": "車3", "tractorPlate": null, "trailerPlate": null, "compartmentsKL": [15, 15] },
+    { "id": "v4", "name": "車4", "tractorPlate": null, "trailerPlate": null, "compartmentsKL": [15, 15] }
+  ],
+  "drivers": [
+    { "id": "d1", "name": "司機A", "homeDepotId": "taichung-depot", "shift": "day", "vehicleId": "v1" },
+    { "id": "d2", "name": "司機B", "homeDepotId": "mailiao-depot", "shift": "day", "vehicleId": "v2" },
+    { "id": "d3", "name": "司機C", "homeDepotId": "mailiao-depot", "shift": "day", "vehicleId": "v3" },
+    { "id": "d4", "name": "司機D", "homeDepotId": "mailiao-depot", "shift": "night", "vehicleId": "v4" }
+  ]
+}

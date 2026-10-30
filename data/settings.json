@@ -1,0 +1,30 @@
+{
+  "operations": {
+    "loadMinutes": 30,
+    "unloadMinutesPerStop": 30,
+    "preTripMinutes": 0
+  },
+  "carToTruckFactor": 1.5,
+  "vehicleDefaults": {
+    "compartmentsKL": [15, 15]
+  },
+  "nightShift": {
+    "startTime": "00:00",
+    "loadingId": "r89"
+  },
+  "orderCaps": [
+    { "depotId": "taichung-depot", "scope": "perDriver", "maxOrders": 3 },
+    { "depotId": "mailiao-depot", "scope": "depotTotal", "maxOrders": 6 }
+  ],
+  "rules": {
+    "maxConsecutiveWorkDays": { "enabled": true, "level": "block", "value": 6 },
+    "minRestBetweenDutiesHours": { "enabled": true, "level": "block", "value": 11 },
+    "stationOpeningHours": { "enabled": true, "level": "block" },
+    "missingLeg": { "enabled": true, "level": "block" },
+    "orderCaps": { "enabled": true, "level": "warn" },
+    "dailyDrivingHours": { "enabled": false, "level": "warn", "value": 10 },
+    "continuousDriving": { "enabled": false, "level": "warn", "maxHours": 4, "breakMinutes": 30 },
+    "dailyWorkHours": { "enabled": false, "level": "block", "value": 12 },
+    "monthlyOvertimeHours": { "enabled": false, "level": "block", "value": 46 }
+  }
+}

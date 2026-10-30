@@ -1,0 +1,59 @@
+{
+  "_說明": "油罐車行車時間（分鐘）。bidirectional=true 表示雙向相同。source：excel=使用者原始 Excel；confirmed=使用者確認；google_x1.5=Google 小客車下限×1.5 進位到 5 分（2026-10-30 查詢，週一 06:00 出發）；estimate=推估，待確認。",
+  "legs": [
+    { "from": "taichung-depot", "to": "changbin", "minutes": 45, "bidirectional": true, "source": "confirmed", "note": "大車限速，比 Google 多" },
+    { "from": "mailiao-depot", "to": "changbin", "minutes": 60, "bidirectional": true, "source": "confirmed" },
+    { "from": "taichung-depot", "to": "mailiao-depot", "minutes": 70, "bidirectional": true, "source": "confirmed", "note": "跨廠支援" },
+    { "from": "mailiao-depot", "to": "r89", "minutes": 20, "bidirectional": true, "source": "excel" },
+
+    { "from": "changbin", "to": "st-miaoli", "minutes": 90, "bidirectional": true, "source": "excel" },
+    { "from": "changbin", "to": "st-qingshui", "minutes": 45, "bidirectional": true, "source": "excel" },
+    { "from": "changbin", "to": "st-changhua", "minutes": 45, "bidirectional": true, "source": "excel" },
+    { "from": "changbin", "to": "st-taichung-jiaotong", "minutes": 45, "bidirectional": true, "source": "confirmed", "note": "使用者先寫 45，可微調（Excel 原為 70）" },
+
+    { "from": "st-miaoli", "to": "st-qingshui", "minutes": 55, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-miaoli", "to": "st-changhua", "minutes": 70, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-miaoli", "to": "st-taichung-jiaotong", "minutes": 55, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-qingshui", "to": "st-changhua", "minutes": 45, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-qingshui", "to": "st-taichung-jiaotong", "minutes": 20, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-changhua", "to": "st-taichung-jiaotong", "minutes": 35, "bidirectional": true, "source": "google_x1.5" },
+
+    { "from": "st-miaoli", "to": "taichung-depot", "minutes": 60, "bidirectional": false, "source": "google_x1.5", "note": "最後一趟直接回廠" },
+    { "from": "st-qingshui", "to": "taichung-depot", "minutes": 15, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "st-changhua", "to": "taichung-depot", "minutes": 40, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "st-taichung-jiaotong", "to": "taichung-depot", "minutes": 20, "bidirectional": false, "source": "google_x1.5" },
+
+    { "from": "st-miaoli", "to": "mailiao-depot", "minutes": 120, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "st-qingshui", "to": "mailiao-depot", "minutes": 70, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "st-changhua", "to": "mailiao-depot", "minutes": 70, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "st-taichung-jiaotong", "to": "mailiao-depot", "minutes": 75, "bidirectional": false, "source": "google_x1.5" },
+
+    { "from": "r89", "to": "st-changhua", "minutes": 100, "bidirectional": false, "source": "google_x1.5", "note": "大夜班送中部 24 小時站（凌晨查詢）" },
+    { "from": "r89", "to": "st-qingshui", "minutes": 100, "bidirectional": false, "source": "google_x1.5", "note": "大夜班" },
+    { "from": "r89", "to": "st-miaoli", "minutes": 150, "bidirectional": false, "source": "google_x1.5", "note": "大夜班" },
+    { "from": "st-changhua", "to": "r89", "minutes": 90, "bidirectional": false, "source": "estimate", "note": "站→麥寮廠 + 20" },
+    { "from": "st-qingshui", "to": "r89", "minutes": 90, "bidirectional": false, "source": "estimate", "note": "站→麥寮廠 + 20" },
+    { "from": "st-miaoli", "to": "r89", "minutes": 140, "bidirectional": false, "source": "estimate", "note": "站→麥寮廠 + 20" },
+    { "from": "st-taichung-jiaotong", "to": "r89", "minutes": 95, "bidirectional": false, "source": "estimate", "note": "站→麥寮廠 + 20" },
+
+    { "from": "r89", "to": "st-mailiao", "minutes": 20, "bidirectional": true, "source": "confirmed", "note": "Excel 另一處寫 30，使用者確認 20" },
+    { "from": "st-mailiao", "to": "mailiao-depot", "minutes": 5, "bidirectional": false, "source": "excel" },
+    { "from": "r89", "to": "st-jiatai", "minutes": 90, "bidirectional": true, "source": "excel" },
+    { "from": "st-jiatai", "to": "mailiao-depot", "minutes": 70, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "r89", "to": "st-jiayi", "minutes": 95, "bidirectional": true, "source": "excel" },
+    { "from": "st-jiayi", "to": "mailiao-depot", "minutes": 75, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "r89", "to": "st-liujia", "minutes": 100, "bidirectional": true, "source": "confirmed", "note": "使用者先寫 100，可修改（Google×1.5 為 115）" },
+    { "from": "st-liujia", "to": "mailiao-depot", "minutes": 100, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "r89", "to": "st-yanchao", "minutes": 150, "bidirectional": true, "source": "confirmed", "note": "Excel 另一處寫 125，使用者確認 150" },
+    { "from": "st-yanchao", "to": "mailiao-depot", "minutes": 120, "bidirectional": false, "source": "google_x1.5" },
+    { "from": "r89", "to": "st-chaozhou", "minutes": 180, "bidirectional": true, "source": "excel" },
+    { "from": "st-chaozhou", "to": "mailiao-depot", "minutes": 165, "bidirectional": false, "source": "google_x1.5" },
+
+    { "from": "st-jiatai", "to": "st-jiayi", "minutes": 25, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-jiatai", "to": "st-liujia", "minutes": 45, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-jiayi", "to": "st-liujia", "minutes": 45, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-liujia", "to": "st-yanchao", "minutes": 75, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-liujia", "to": "st-chaozhou", "minutes": 90, "bidirectional": true, "source": "google_x1.5" },
+    { "from": "st-yanchao", "to": "st-chaozhou", "minutes": 45, "bidirectional": true, "source": "google_x1.5" }
+  ]
+}
