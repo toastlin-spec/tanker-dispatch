@@ -83,7 +83,9 @@ async function startEmbeddedPostgres() {
     createPostgresUser: isRoot,
     initdbFlags,
     onLog: () => {},
-    onError: (err) => log('db', String(err)),
+    onError: (err) => {
+      if (!shuttingDown) log('db', String(err));
+    },
   });
 
   if (!existsSync(join(dataDir, 'PG_VERSION'))) {
@@ -124,7 +126,7 @@ function serve(tag, command, commandArgs, cwd = root, extraEnv = {}) {
     cwd,
     env: { ...process.env, FORCE_COLOR: '1', ...extraEnv },
     stdio: ['ignore', 'pipe', 'pipe'],
-    shell: isWindows,
+    shell: false,
   });
   child.stdout.on('data', (chunk) => log(tag, chunk));
   child.stderr.on('data', (chunk) => log(tag, chunk));
@@ -142,7 +144,18 @@ let shuttingDown = false;
 async function shutdown(code = 0) {
   if (shuttingDown) return;
   shuttingDown = true;
-  for (const child of children) if (child.exitCode === null) child.kill('SIGTERM');
+  await Promise.all(
+    children
+      .filter((child) => child.exitCode === null && child.signalCode === null)
+      .map(
+        (child) =>
+          new Promise((resolve) => {
+            child.once('exit', resolve);
+            child.kill('SIGTERM');
+            setTimeout(resolve, 5000);
+          }),
+      ),
+  );
   await stopEmbeddedPostgres();
   process.exit(code);
 }
@@ -169,11 +182,16 @@ async function main() {
     return;
   }
 
-  run('api', npx, ['tsc', '-p', 'tsconfig.build.json'], apiDir);
-  serve('core', npx, ['tsc', '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], join(root, 'packages/core'));
-  serve('api', npx, ['tsc', '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], apiDir);
+  // 長時間執行的程序直接用 node 啟動（不經過 npx），結束時才能確實關閉。
+  const require = createRequire(import.meta.url);
+  const tsc = require.resolve('typescript/bin/tsc');
+  const vitePkg = require.resolve('vite/package.json', { paths: [join(root, 'apps/web')] });
+  const vite = join(dirname(vitePkg), JSON.parse(readFileSync(vitePkg, 'utf8')).bin.vite);
+  run('api', process.execPath, [tsc, '-p', 'tsconfig.build.json'], apiDir);
+  serve('core', process.execPath, [tsc, '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], join(root, 'packages/core'));
+  serve('api', process.execPath, [tsc, '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'], apiDir);
   serve('api', process.execPath, ['--watch', 'dist/main.js'], apiDir, { PORT: String(API_PORT) });
-  serve('web', npx, ['vite', '--port', String(WEB_PORT), '--strictPort', '--host'], join(root, 'apps/web'), { API_PORT: String(API_PORT) });
+  serve('web', process.execPath, [vite, '--port', String(WEB_PORT), '--strictPort', '--host'], join(root, 'apps/web'), { API_PORT: String(API_PORT) });
   log('dev', `開發環境啟動中：前端 http://localhost:${WEB_PORT}　API http://localhost:${API_PORT}/api（按 Ctrl+C 結束）`);
 }
 
